@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "530650599028",
-    "firebase_url": "https://chat-test-app-6c95a-default-rtdb.firebaseio.com",
-    "project_id": "chat-test-app-6c95a",
-    "storage_bucket": "chat-test-app-6c95a.appspot.com"
+    "project_number": "533913097774",
+    "firebase_url": "https://prochat-v0-default-rtdb.firebaseio.com",
+    "project_id": "prochat-v0",
+    "storage_bucket": "prochat-v0.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:530650599028:android:bf093441063e513fbf0b21",
+        "mobilesdk_app_id": "1:533913097774:android:ba145eeb96f899dccd71bf",
         "android_client_info": {
           "package_name": "com.app.chattestapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "530650599028-gab8fshha4heg1g5ih16s3797nd6gt08.apps.googleusercontent.com",
+          "client_id": "533913097774-gfe86q54v9bir679iki98c2g1kv79l22.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyASbkm8k0ICrcDODEIsLL-GD1JFp4qBJVM"
+          "current_key": "AIzaSyARMbyhq6rCsDG_zhcrsoVd7Pmf1rwGCRM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "530650599028-gab8fshha4heg1g5ih16s3797nd6gt08.apps.googleusercontent.com",
+              "client_id": "533913097774-gfe86q54v9bir679iki98c2g1kv79l22.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

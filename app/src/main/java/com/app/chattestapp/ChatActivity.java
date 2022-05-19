@@ -3,6 +3,7 @@ package com.app.chattestapp;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.DateFormat;
@@ -85,6 +86,7 @@ public class ChatActivity extends AppCompatActivity {
                     if (currentUser.isAvailable()) {
                         addMessageBox(chatWithUser.getUsername() + ":-\n" + msg.getText(), msg.getTime(), 2);
                     } else {
+
 //                        addMessageBox("user isn't available now", msg.getTime(), 2);
 //                        final Handler handler = new Handler();
 //                        handler.postDelayed(new Runnable() {

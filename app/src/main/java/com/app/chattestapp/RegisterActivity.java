@@ -57,17 +57,21 @@ public class RegisterActivity extends AppCompatActivity {
 
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(username).build();
-                            firebaseUser.updateProfile(profileUpdates);
-                            //add user to real-time database
-                            User user = new User(email, username, password, true);
-                            FirebaseDatabase.getInstance().getReference("users").push()
-                                    .setValue(user).addOnCompleteListener(task1 -> {
+                            firebaseUser.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    //add user to real-time database
+                                    User user = new User(email, username, password, true);
+                                    FirebaseDatabase.getInstance().getReference("users").push()
+                                            .setValue(user).addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
                                             startActivity(new Intent(RegisterActivity.this, UsersActivity.class));
                                         } else {
                                             Toast.makeText(RegisterActivity.this, "Can't create user, please try again", Toast.LENGTH_SHORT).show();
                                         }
                                     });
+                                }
+                            });
                         } else {
                             Toast.makeText(RegisterActivity.this, "Can't create user, please try again", Toast.LENGTH_SHORT).show();
                         }

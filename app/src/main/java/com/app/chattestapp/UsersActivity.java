@@ -49,6 +49,7 @@ public class UsersActivity extends AppCompatActivity {
                 List<User> users = new ArrayList<>();
                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                     User user = userSnapshot.getValue(User.class);
+                    user.setId(userSnapshot.getKey());
                     if (!user.getEmail().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
                         usersUsername.add(user.getUsername());
                         users.add(user);
@@ -63,7 +64,7 @@ public class UsersActivity extends AppCompatActivity {
                 usersListView.setAdapter(usersAdapter);
                 usersListView.setOnItemClickListener((parent, view, position, id) -> {
                     User selectedUser = users.get(position+1);
-                    Intent intent = new Intent(UsersActivity.this, ChatActivity.class);
+                    Intent intent = new Intent(UsersActivity.this, ChatActivity2.class);
                     intent.putExtra("USER2", selectedUser);
                     intent.putExtra("USER1", users.get(0));
                     startActivity(intent);
