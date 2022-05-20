@@ -1,15 +1,7 @@
 package com.app.chattestapp;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.EditText;
 
 import com.google.firebase.database.ChildEventListener;
@@ -21,6 +13,15 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.UpdateChatMessageCallback {
 
@@ -35,6 +36,8 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
     private DatabaseReference chatsRef = firebaseDatabase.getReference("chats");
     private String chatNameUser1;
     private String chatNameUser2;
+    private List<ChatMessage2> chatMessages;
+    private MessagesAdapter messagesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,20 +48,73 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
         currentUser = getIntent().getParcelableExtra("USER1");
         chatWithUser = getIntent().getParcelableExtra("USER2");
 
-        List<ChatMessage2> chatMessages = new ArrayList<>();
-        MessagesAdapter messagesAdapter = new MessagesAdapter(chatMessages, this, currentUser, chatWithUser);
+        chatMessages = new ArrayList<>();
+        messagesAdapter = new MessagesAdapter(chatMessages, this, currentUser, chatWithUser);
         messagesRecyclerView.setAdapter(messagesAdapter);
         messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //create chat node for the two users
         setupChatInFirebase();
         //retrieve messages
+        loadMessages();
+        //get not received messages
+        loadNotReceivedMessages();
+    }
+
+    private void loadNotReceivedMessages() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                chatsRef.child(chatNameUser1).child("messages").orderByChild("received").equalTo(false)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
+                                    ChatMessage2 chatMessage = messageSnapshot.getValue(ChatMessage2.class);
+                                    if (!chatMessage.getFrom().equals(currentUser.getUsername())) {
+                                        chatMessages.add(chatMessage);
+                                        messagesAdapter.notifyDataSetChanged();
+                                        chatMessage.setReceived(true);
+                                        updateChatMessage(chatMessage);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+            }
+
+        }, 10000);
+
+    }
+
+    private void loadMessages() {
         chatsRef.child(chatNameUser1).child("messages").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 ChatMessage2 chatMessage = snapshot.getValue(ChatMessage2.class);
-                chatMessages.add(chatMessage);
-                messagesAdapter.notifyDataSetChanged();
+                if (currentUser.isAvailable()) {
+                    chatMessages.add(chatMessage);
+                    messagesAdapter.notifyDataSetChanged();
+                    chatMessage.setReceived(true);
+                    updateChatMessage(chatMessage);
+                } else {
+                    if (chatMessage.getFrom().equals(currentUser.getUsername())) {
+                        chatMessages.add(chatMessage);
+                        messagesAdapter.notifyDataSetChanged();
+                    } else if (chatMessage.isReceived()) {
+                        chatMessages.add(chatMessage);
+                        messagesAdapter.notifyDataSetChanged();
+                    } else {
+                        //messages from the other user
+                        chatMessage.setReceived(false);
+                        updateChatMessage(chatMessage);
+                    }
+                }
             }
 
             @Override

@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -21,15 +19,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
 
     private List<ChatMessage2> messagesList;
     private UpdateChatMessageCallback updateChatMessageCallback;
-    private User fromUser;
-    private User toUser;
-    private boolean currentUser;
+    private User currentUser;
+    private User chatUser;
 
-    public MessagesAdapter(List<ChatMessage2> messagesList, UpdateChatMessageCallback updateChatMessageCallback, User fromUser, User toUser) {
+    public MessagesAdapter(List<ChatMessage2> messagesList, UpdateChatMessageCallback updateChatMessageCallback, User currentUser, User chatUser) {
         this.messagesList = messagesList;
         this.updateChatMessageCallback = updateChatMessageCallback;
-        this.fromUser = fromUser;
-        this.toUser = toUser;
+        this.currentUser = currentUser;
+        this.chatUser = chatUser;
     }
 
     @NonNull
@@ -43,22 +40,15 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         ChatMessage2 chatMessage2 = messagesList.get(position);
         //check if the sender is the current user
-        String currentUser = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-        if (currentUser.equals(chatMessage2.getFrom())) {
-            holder.fromTextView.setText("You:-");
+        //show all messages
+        holder.fromTextView.setText(chatMessage2.getFrom());
+        holder.msgTextView.setText(chatMessage2.getMessage());
+        holder.timeTextView.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", chatMessage2.getTime()));
+
+        if (currentUser.getUsername().equals(chatMessage2.getFrom())) {
             holder.messageLayout.setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.rounded_corner2));
-            holder.msgTextView.setText(chatMessage2.getMessage());
-            holder.timeTextView.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", chatMessage2.getTime()));
         } else {
-//            if (fromUser.isAvailable()) {
-                holder.fromTextView.setText(chatMessage2.getFrom() + ":-");
-                holder.messageLayout.setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.rounded_corner3));
-                holder.msgTextView.setText(chatMessage2.getMessage());
-                holder.timeTextView.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", chatMessage2.getTime()));
-                chatMessage2.setReceived(true);
-                //update chat message in database
-//                updateChatMessage(chatMessage2);
-//            }
+            holder.messageLayout.setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.rounded_corner3));
         }
     }
 
