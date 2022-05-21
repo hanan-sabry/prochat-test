@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChatActivity2"></activity>
+        <activity android:name=".ChatActivity2"/>
         <activity android:name=".UsersActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".ChatActivity" />
@@ -23,24 +23,16 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".MyBroadcastReceiver"></receiver>
-        <service
-            android:name=".MyFirebaseIDService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-
         <service
             android:name=".FirebaseMessageReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <receiver android:name=".AvailableAlertReceiver" />
+        <receiver android:name=".NotAvailableAlertReceiver" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

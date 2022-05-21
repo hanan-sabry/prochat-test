@@ -1,5 +1,8 @@
 package com.app.chattestapp;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,8 +12,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -55,6 +57,10 @@ public class UsersActivity extends AppCompatActivity {
                         users.add(user);
                     } else {
                         users.add(0, user);
+                        if (user.isAvailable_limit()) {
+                            setAvailableAlarmForUser(user);
+                            setNotAvailableAlarmForUser(user);
+                        }
                     }
                 }
                 if (usersUsername.isEmpty()) {
@@ -77,6 +83,56 @@ public class UsersActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void setAvailableAlarmForUser(User user) {
+        String[] from = user.getAvailable_from().split(":");
+        //set available alarm for the user
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(from[0]));
+        c.set(Calendar.MINUTE, Integer.parseInt(from[1]));
+        c.set(Calendar.SECOND, 0);
+        startAvailableAlarm(c);
+    }
+
+    private void setNotAvailableAlarmForUser(User user) {
+        String[] to = user.getAvailable_to().split(":");
+        //set available alarm for the user
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(to[0]));
+        c.set(Calendar.MINUTE, Integer.parseInt(to[1]));
+        c.set(Calendar.SECOND, 0);
+        startNotAvailableAlarm(c);
+    }
+
+    private void startAvailableAlarm(Calendar c) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AvailableAlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
+
+        if (c.before(Calendar.getInstance())) {
+            c.add(Calendar.DATE, 1);
+        }
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+    }
+    private void startNotAvailableAlarm(Calendar c) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, NotAvailableAlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 2, intent, 0);
+
+        if (c.before(Calendar.getInstance())) {
+            c.add(Calendar.DATE, 1);
+        }
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+    }
+    private void cancelAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AvailableAlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
+
+        alarmManager.cancel(pendingIntent);
     }
 
     @Override

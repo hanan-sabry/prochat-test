@@ -1,5 +1,9 @@
 package com.app.chattestapp;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.EditText;
@@ -12,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -48,47 +53,85 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
         currentUser = getIntent().getParcelableExtra("USER1");
         chatWithUser = getIntent().getParcelableExtra("USER2");
 
+        setTitle("Chat with: " + chatWithUser.getUsername());
         chatMessages = new ArrayList<>();
-        messagesAdapter = new MessagesAdapter(chatMessages, this, currentUser, chatWithUser);
+        messagesAdapter = new MessagesAdapter(chatMessages, this, currentUser);
         messagesRecyclerView.setAdapter(messagesAdapter);
         messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //create chat node for the two users
         setupChatInFirebase();
+        //update user availability
+        updateUserAvailability();
         //retrieve messages
         loadMessages();
         //get not received messages
-        loadNotReceivedMessages();
+        if (currentUser.isAvailable()) {
+            loadNotReceivedMessages();
+        }
+
+        String availableFrom = currentUser.getAvailable_from();
+        String availableTo = currentUser.getAvailable_to();
+    }
+
+    private void updateUserAvailability() {
+        firebaseDatabase.getReference("users").child(currentUser.getId())
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                        boolean isAvailable = (boolean) snapshot.getValue();
+                        currentUser.setAvailable(isAvailable);
+                        if (isAvailable) {
+                            //get not received messages
+                            loadNotReceivedMessages();
+                        }
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void loadNotReceivedMessages() {
         final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                chatsRef.child(chatNameUser1).child("messages").orderByChild("received").equalTo(false)
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
-                                    ChatMessage2 chatMessage = messageSnapshot.getValue(ChatMessage2.class);
-                                    if (!chatMessage.getFrom().equals(currentUser.getUsername())) {
-                                        chatMessages.add(chatMessage);
-                                        messagesAdapter.notifyDataSetChanged();
-                                        chatMessage.setReceived(true);
-                                        updateChatMessage(chatMessage);
-                                    }
-                                }
+        handler.postDelayed(() -> chatsRef.child(chatNameUser1).child("messages").orderByChild("received").equalTo(false)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
+                            ChatMessage2 chatMessage = messageSnapshot.getValue(ChatMessage2.class);
+                            if (!chatMessage.getFrom().equals(currentUser.getUsername())) {
+                                chatMessages.add(chatMessage);
+                                messagesAdapter.notifyDataSetChanged();
+                                chatMessage.setReceived(true);
+                                updateChatMessage(chatMessage);
                             }
+                        }
+                        messagesRecyclerView.smoothScrollToPosition(chatMessages.size()-1);
+                    }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-                            }
-                        });
-            }
-
-        }, 10000);
+                    }
+                }), 5000);
 
     }
 
@@ -115,6 +158,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
                         updateChatMessage(chatMessage);
                     }
                 }
+                messagesRecyclerView.smoothScrollToPosition(chatMessages.size()-1);
             }
 
             @Override

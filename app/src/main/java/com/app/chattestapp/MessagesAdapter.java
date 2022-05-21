@@ -20,13 +20,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.Messag
     private List<ChatMessage2> messagesList;
     private UpdateChatMessageCallback updateChatMessageCallback;
     private User currentUser;
-    private User chatUser;
 
-    public MessagesAdapter(List<ChatMessage2> messagesList, UpdateChatMessageCallback updateChatMessageCallback, User currentUser, User chatUser) {
+    public MessagesAdapter(List<ChatMessage2> messagesList, UpdateChatMessageCallback updateChatMessageCallback, User currentUser) {
         this.messagesList = messagesList;
         this.updateChatMessageCallback = updateChatMessageCallback;
         this.currentUser = currentUser;
-        this.chatUser = chatUser;
     }
 
     @NonNull

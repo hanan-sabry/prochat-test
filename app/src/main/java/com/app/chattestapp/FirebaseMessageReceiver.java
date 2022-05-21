@@ -1,6 +1,5 @@
 package com.app.chattestapp;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,22 +8,14 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 public class FirebaseMessageReceiver extends FirebaseMessagingService {
@@ -40,8 +31,7 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
     }
 
     @Override
-    public void
-    onMessageReceived(RemoteMessage remoteMessage) {
+    public void onMessageReceived(RemoteMessage remoteMessage) {
         if (remoteMessage.getNotification() != null) {
             Map<String, String> data = remoteMessage.getData();
             showNotification(
@@ -50,41 +40,6 @@ public class FirebaseMessageReceiver extends FirebaseMessagingService {
 
             String chatWith = data.get("user1");
             String currentUser = data.get("user2");
-            currentUserMsgRef = messagesRef.child(currentUser + "_" + chatWith);
-            user2Msg = messagesRef.child(chatWith + "_" + currentUser);
-            currentUserMsgRef.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    ChatMessage msg = snapshot.getValue(ChatMessage.class);
-//                    if (msg.getUser().equals(currentUser)) {
-////                        addMessageBox("You:-\n" + msg.getText(), msg.getTime(), 1);
-//                        Toast.makeText(getApplicationContext(), "You:-\n" + msg.getText(), Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        addMessageBox(chatWith + ":-\n" + msg.getText(), msg.getTime(), 2);
-                        Toast.makeText(getApplicationContext(), chatWith + ":-\n" + msg.getText(), Toast.LENGTH_SHORT).show();
-//                    }
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
         }
     }
 
