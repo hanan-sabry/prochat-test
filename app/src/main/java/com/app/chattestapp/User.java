@@ -11,8 +11,8 @@ public class User implements Parcelable {
     private String password;
     private boolean available;
     private boolean available_limit;
-    private String available_from;
-    private String available_to;
+    private long available_from;
+    private long available_to;
 
     public User() {
     }
@@ -32,8 +32,8 @@ public class User implements Parcelable {
         password = in.readString();
         available = in.readByte() != 0;
         available_limit = in.readByte() != 0;
-        available_from = in.readString();
-        available_to = in.readString();
+        available_from = in.readLong();
+        available_to = in.readLong();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -96,19 +96,19 @@ public class User implements Parcelable {
         this.available_limit = available_limit;
     }
 
-    public String getAvailable_from() {
+    public long getAvailable_from() {
         return available_from;
     }
 
-    public void setAvailable_from(String available_from) {
+    public void setAvailable_from(long available_from) {
         this.available_from = available_from;
     }
 
-    public String getAvailable_to() {
+    public long getAvailable_to() {
         return available_to;
     }
 
-    public void setAvailable_to(String available_to) {
+    public void setAvailable_to(long available_to) {
         this.available_to = available_to;
     }
 
@@ -126,8 +126,8 @@ public class User implements Parcelable {
         dest.writeString(password);
         dest.writeByte((byte) (available ? 1 : 0));
         dest.writeByte((byte) (available_limit ? 1 : 0));
-        dest.writeString(available_from);
-        dest.writeString(available_to);
+        dest.writeLong(available_from);
+        dest.writeLong(available_to);
     }
 
 }

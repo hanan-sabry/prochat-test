@@ -34,6 +34,7 @@ public class UsersActivity extends AppCompatActivity {
     ListView usersListView;
     @BindView(R.id.noUsersText)
     TextView noUsersText;
+    private ArrayList<User> users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +49,7 @@ public class UsersActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<String> usersUsername = new ArrayList<>();
-                List<User> users = new ArrayList<>();
+                users = new ArrayList<>();
                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                     User user = userSnapshot.getValue(User.class);
                     user.setId(userSnapshot.getKey());
@@ -57,10 +58,10 @@ public class UsersActivity extends AppCompatActivity {
                         users.add(user);
                     } else {
                         users.add(0, user);
-                        if (user.isAvailable_limit()) {
-                            setAvailableAlarmForUser(user);
-                            setNotAvailableAlarmForUser(user);
-                        }
+//                        if (user.isAvailable_limit()) {
+//                            setAvailableAlarmForUser(user);
+//                            setNotAvailableAlarmForUser(user);
+//                        }
                     }
                 }
                 if (usersUsername.isEmpty()) {
@@ -85,48 +86,48 @@ public class UsersActivity extends AppCompatActivity {
 
     }
 
-    private void setAvailableAlarmForUser(User user) {
-        String[] from = user.getAvailable_from().split(":");
-        //set available alarm for the user
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(from[0]));
-        c.set(Calendar.MINUTE, Integer.parseInt(from[1]));
-        c.set(Calendar.SECOND, 0);
-        startAvailableAlarm(c);
-    }
+//    private void setAvailableAlarmForUser(User user) {
+//        String[] from = user.getAvailable_from().split(":");
+//        //set available alarm for the user
+//        Calendar c = Calendar.getInstance();
+//        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(from[0]));
+//        c.set(Calendar.MINUTE, Integer.parseInt(from[1]));
+//        c.set(Calendar.SECOND, 0);
+//        startAvailableAlarm(c);
+//    }
+//
+//    private void setNotAvailableAlarmForUser(User user) {
+//        String[] to = user.getAvailable_to().split(":");
+//        //set available alarm for the user
+//        Calendar c = Calendar.getInstance();
+//        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(to[0]));
+//        c.set(Calendar.MINUTE, Integer.parseInt(to[1]));
+//        c.set(Calendar.SECOND, 0);
+//        startNotAvailableAlarm(c);
+//    }
 
-    private void setNotAvailableAlarmForUser(User user) {
-        String[] to = user.getAvailable_to().split(":");
-        //set available alarm for the user
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(to[0]));
-        c.set(Calendar.MINUTE, Integer.parseInt(to[1]));
-        c.set(Calendar.SECOND, 0);
-        startNotAvailableAlarm(c);
-    }
-
-    private void startAvailableAlarm(Calendar c) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AvailableAlertReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
-
-        if (c.before(Calendar.getInstance())) {
-            c.add(Calendar.DATE, 1);
-        }
-
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-    }
-    private void startNotAvailableAlarm(Calendar c) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, NotAvailableAlertReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 2, intent, 0);
-
-        if (c.before(Calendar.getInstance())) {
-            c.add(Calendar.DATE, 1);
-        }
-
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-    }
+//    private void startAvailableAlarm(Calendar c) {
+//        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//        Intent intent = new Intent(this, AvailableAlertReceiver.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
+//
+//        if (c.before(Calendar.getInstance())) {
+//            c.add(Calendar.DATE, 1);
+//        }
+//
+//        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+//    }
+//    private void startNotAvailableAlarm(Calendar c) {
+//        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//        Intent intent = new Intent(this, NotAvailableAlertReceiver.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 2, intent, 0);
+//
+//        if (c.before(Calendar.getInstance())) {
+//            c.add(Calendar.DATE, 1);
+//        }
+//
+//        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+//    }
     private void cancelAlarm() {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AvailableAlertReceiver.class);
@@ -147,6 +148,10 @@ public class UsersActivity extends AppCompatActivity {
             FirebaseAuth.getInstance().signOut();
             finish();
             startActivity(new Intent(this, LoginActivity.class));
+        } else if (item.getItemId() == R.id.settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            intent.putExtra("USER1", users.get(0));
+            startActivity(intent);
         }
         return true;
     }
