@@ -9,6 +9,7 @@ public class User implements Parcelable {
     private String email;
     private String username;
     private String password;
+    private String deviceToken;
     private boolean available;
     private boolean available_limit;
     private long available_from;
@@ -17,10 +18,11 @@ public class User implements Parcelable {
     public User() {
     }
 
-    public User(String email, String username, String password, boolean available) {
+    public User(String email, String username, String password, String deviceToken, boolean available) {
         this.email = email;
         this.username = username;
         this.password = password;
+        this.deviceToken = deviceToken;
         this.available = available;
     }
 
@@ -30,6 +32,7 @@ public class User implements Parcelable {
         email = in.readString();
         username = in.readString();
         password = in.readString();
+        deviceToken = in.readString();
         available = in.readByte() != 0;
         available_limit = in.readByte() != 0;
         available_from = in.readLong();
@@ -80,6 +83,14 @@ public class User implements Parcelable {
         this.password = password;
     }
 
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
+
     public boolean isAvailable() {
         return available;
     }
@@ -124,6 +135,7 @@ public class User implements Parcelable {
         dest.writeString(email);
         dest.writeString(username);
         dest.writeString(password);
+        dest.writeString(deviceToken);
         dest.writeByte((byte) (available ? 1 : 0));
         dest.writeByte((byte) (available_limit ? 1 : 0));
         dest.writeLong(available_from);

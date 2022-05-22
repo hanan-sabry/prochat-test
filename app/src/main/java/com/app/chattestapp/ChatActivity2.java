@@ -213,6 +213,10 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
         chatsRef.child(chatNameUser1).child("messages").child(msgId).setValue(chatMsg);
         chatsRef.child(chatNameUser2).child("messages").child(msgId).setValue(chatMsg);
         messageAreaEditText.setText("");
+
+        //send notification to user
+        NotificationRequest notificationRequest = new NotificationRequest(this);
+        notificationRequest.sendNotificationRequest(currentUser.getUsername(), message, chatWithUser.getDeviceToken());
     }
 
     @Override

@@ -41,12 +41,10 @@ public class AvailableAlertReceiver extends BroadcastReceiver {
                         Map<String, Object> availableMap = new HashMap<>();
                         availableMap.put("available", true);
                         FirebaseDatabase.getInstance().getReference("users").child(userSnapshot.getKey())
-                                .updateChildren(availableMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-//                                cancelAlarm(context);
-                            }
-                        });
+                                .updateChildren(availableMap).addOnCompleteListener(task -> {
+    //                                cancelAlarm(context);
+                            //check if there is not received messages, and send notifications with them
+                                });
                     }
                 }
             }

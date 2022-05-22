@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -47,34 +48,40 @@ public class RegisterActivity extends AppCompatActivity {
         if (username.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "You must enter username and password", Toast.LENGTH_SHORT).show();
         } else {
-            FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(RegisterActivity.this, "User is created successfully", Toast.LENGTH_SHORT).show();
-                            //add display name for the user
-                            FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+            FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+                @Override
+                public void onComplete(@NonNull Task<String> tokenTask) {
+                    String token = tokenTask.getResult();
+                    FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(RegisterActivity.this, "User is created successfully", Toast.LENGTH_SHORT).show();
+                                    //add display name for the user
+                                    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(username).build();
-                            firebaseUser.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    //add user to real-time database
-                                    User user = new User(email, username, password, true);
-                                    FirebaseDatabase.getInstance().getReference("users").push()
-                                            .setValue(user).addOnCompleteListener(task1 -> {
-                                        if (task1.isSuccessful()) {
-                                            startActivity(new Intent(RegisterActivity.this, UsersActivity.class));
-                                        } else {
-                                            Toast.makeText(RegisterActivity.this, "Can't create user, please try again", Toast.LENGTH_SHORT).show();
+                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                            .setDisplayName(username).build();
+                                    firebaseUser.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            //add user to real-time database
+                                            User user = new User(email, username, password, token, true);
+                                            FirebaseDatabase.getInstance().getReference("users").push()
+                                                    .setValue(user).addOnCompleteListener(task1 -> {
+                                                if (task1.isSuccessful()) {
+                                                    startActivity(new Intent(RegisterActivity.this, UsersActivity.class));
+                                                } else {
+                                                    Toast.makeText(RegisterActivity.this, "Can't create user, please try again", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
                                         }
                                     });
+                                } else {
+                                    Toast.makeText(RegisterActivity.this, "Can't create user, please try again", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Can't create user, please try again", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                }
+            });
         }
     }
 

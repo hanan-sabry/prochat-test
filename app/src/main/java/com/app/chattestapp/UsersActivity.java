@@ -58,10 +58,6 @@ public class UsersActivity extends AppCompatActivity {
                         users.add(user);
                     } else {
                         users.add(0, user);
-//                        if (user.isAvailable_limit()) {
-//                            setAvailableAlarmForUser(user);
-//                            setNotAvailableAlarmForUser(user);
-//                        }
                     }
                 }
                 if (usersUsername.isEmpty()) {
