@@ -70,7 +70,6 @@ public class UsersActivity extends AppCompatActivity {
                     Intent intent = new Intent(UsersActivity.this, ChatActivity2.class);
                     intent.putExtra("USER2", selectedUser);
                     intent.putExtra("USER1", users.get(0));
-                    startActivity(intent);
                 });
             }
 
@@ -80,56 +79,6 @@ public class UsersActivity extends AppCompatActivity {
             }
         });
 
-    }
-
-//    private void setAvailableAlarmForUser(User user) {
-//        String[] from = user.getAvailable_from().split(":");
-//        //set available alarm for the user
-//        Calendar c = Calendar.getInstance();
-//        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(from[0]));
-//        c.set(Calendar.MINUTE, Integer.parseInt(from[1]));
-//        c.set(Calendar.SECOND, 0);
-//        startAvailableAlarm(c);
-//    }
-//
-//    private void setNotAvailableAlarmForUser(User user) {
-//        String[] to = user.getAvailable_to().split(":");
-//        //set available alarm for the user
-//        Calendar c = Calendar.getInstance();
-//        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(to[0]));
-//        c.set(Calendar.MINUTE, Integer.parseInt(to[1]));
-//        c.set(Calendar.SECOND, 0);
-//        startNotAvailableAlarm(c);
-//    }
-
-//    private void startAvailableAlarm(Calendar c) {
-//        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//        Intent intent = new Intent(this, AvailableAlertReceiver.class);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
-//
-//        if (c.before(Calendar.getInstance())) {
-//            c.add(Calendar.DATE, 1);
-//        }
-//
-//        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-//    }
-//    private void startNotAvailableAlarm(Calendar c) {
-//        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//        Intent intent = new Intent(this, NotAvailableAlertReceiver.class);
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 2, intent, 0);
-//
-//        if (c.before(Calendar.getInstance())) {
-//            c.add(Calendar.DATE, 1);
-//        }
-//
-//        alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-//    }
-    private void cancelAlarm() {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AvailableAlertReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
-
-        alarmManager.cancel(pendingIntent);
     }
 
     @Override

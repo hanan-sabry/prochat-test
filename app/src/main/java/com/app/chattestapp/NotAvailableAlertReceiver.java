@@ -27,7 +27,7 @@ public class NotAvailableAlertReceiver extends BroadcastReceiver {
         Toast.makeText(context, "Not Avaliable Alarm is set", Toast.LENGTH_SHORT).show();
 
         NotificationHelper notificationHelper = new NotificationHelper(context);
-        NotificationCompat.Builder nb = notificationHelper.getChannelNotification();
+        NotificationCompat.Builder nb = notificationHelper.getChannelNotification("Alarm!", "You'll stop receiving messages");
         notificationHelper.getManager().notify(1, nb.build());
 
         //get current user

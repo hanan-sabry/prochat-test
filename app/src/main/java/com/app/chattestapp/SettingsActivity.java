@@ -1,13 +1,11 @@
 package com.app.chattestapp;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 import android.app.AlarmManager;
@@ -16,11 +14,12 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,12 +35,14 @@ public class SettingsActivity extends AppCompatActivity implements TimePickerDia
 
     @BindView(R.id.availableTimeLimitSwitch)
     SwitchCompat availableTimeLimitSwitch;
-    @BindView(R.id.isAvailableSwitch)
-    SwitchCompat isAvailableSwitch;
+    @BindView(R.id.isAvailableTextView)
+    TextView isAvailableTextView;
     @BindView(R.id.availablefrom)
-    TextView availablefrom;
+    TextView availableFrom;
     @BindView(R.id.availableTo)
     TextView availableTo;
+    @BindView(R.id.timeLayout)
+    LinearLayout timeLayout;
 
     boolean isFromClicked = false;
     boolean isToClicked = false;
@@ -68,10 +69,18 @@ public class SettingsActivity extends AppCompatActivity implements TimePickerDia
                 long to = user.getAvailable_to();
 
                 availableTimeLimitSwitch.setChecked(timeLimit);
-                isAvailableSwitch.setChecked(available);
+                isAvailableTextView.setText(available?"Available" : "Not Available");
                 CharSequence time = android.text.format.DateFormat.format("HH:mm", from);
-                availablefrom.setText("Alarm set for: " + (android.text.format.DateFormat.format("hh:mm a", from)));
-                availableTo.setText("Alarm set for: " + (android.text.format.DateFormat.format("hh:mm a", to)));
+                if (from == 0) {
+                    availableFrom.setText("Set time");
+                } else {
+                    availableFrom.setText("Alarm set for: " + (android.text.format.DateFormat.format("hh:mm a", from)));
+                }
+                if (to == 0) {
+                    availableTo.setText("Set time");
+                } else {
+                    availableTo.setText("Alarm set for: " + (android.text.format.DateFormat.format("hh:mm a", to)));
+                }
             }
 
             @Override
@@ -87,6 +96,12 @@ public class SettingsActivity extends AppCompatActivity implements TimePickerDia
                 Map<String, Object> updates = new HashMap<>();
                 updates.put("available_limit", isChecked);
                 usersRef.child(currentUser.getId()).updateChildren(updates);
+
+                if (isChecked) {
+                    timeLayout.setVisibility(View.VISIBLE);
+                } else {
+                    timeLayout.setVisibility(View.INVISIBLE);
+                }
             }
         });
     }
@@ -116,7 +131,7 @@ public class SettingsActivity extends AppCompatActivity implements TimePickerDia
 
         //update in database - to do
         if (isFromClicked && !isToClicked) {
-            updateTimeText(c, availablefrom);
+            updateTimeText(c, availableFrom);
             updateFromTimeInDB(c);
             startAvailableAlarm(c);
         }
