@@ -8,6 +8,17 @@
     android:orientation="vertical"
     android:weightSum="10">
 
+    <TextView
+        android:id="@+id/userAvailableTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="@drawable/rounded_corner1"
+        android:drawableStart="@android:drawable/ic_dialog_alert"
+        android:text="User is currently not receiving messages"
+        android:gravity="center"
+        android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messagesRecyclerView"
         android:layout_width="match_parent"

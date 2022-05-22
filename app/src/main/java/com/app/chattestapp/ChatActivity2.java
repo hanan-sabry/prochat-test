@@ -1,7 +1,9 @@
 package com.app.chattestapp;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +30,8 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
     EditText messageAreaEditText;
     @BindView(R.id.messagesRecyclerView)
     RecyclerView messagesRecyclerView;
+    @BindView(R.id.userAvailableTextView)
+    TextView userAvailableTextView;
 
     private User currentUser;
     private User chatWithUser;
@@ -59,10 +63,12 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
         updateUserAvailability();
         //retrieve messages
         loadMessages();
-        //get not received messages
-//        if (currentUser.isAvailable()) {
-//            loadNotReceivedMessages();
-//        }
+        //show if user is available or not
+        if (chatWithUser.isAvailable()) {
+            userAvailableTextView.setVisibility(View.GONE);
+        } else {
+            userAvailableTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void updateUserAvailability() {
@@ -81,6 +87,41 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
                             if (isAvailable) {
                                 //get not received messages
                                 loadNotReceivedMessages();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+        firebaseDatabase.getReference("users").child(chatWithUser.getId())
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                    }
+
+                    @Override
+                    public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                        if (snapshot.getKey().equals("available")) {
+                            boolean isAvailable = (boolean) snapshot.getValue();
+                            if (isAvailable) {
+                                userAvailableTextView.setVisibility(View.GONE);
+                            } else {
+                                userAvailableTextView.setVisibility(View.VISIBLE);
                             }
                         }
                     }
@@ -119,7 +160,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
                                     updateChatMessage(chatMessage);
                                 }
                             }
-                            messagesRecyclerView.smoothScrollToPosition(chatMessages.size() - 1);
+                            messagesRecyclerView.scrollToPosition(chatMessages.size() - 1);
                         }
                     }
 
@@ -155,7 +196,7 @@ public class ChatActivity2 extends AppCompatActivity implements MessagesAdapter.
                         updateChatMessage(chatMessage);
                     }
                 }
-                messagesRecyclerView.smoothScrollToPosition(chatMessages.size() - 1);
+                messagesRecyclerView.scrollToPosition(chatMessages.size() - 1);
             }
 
             @Override
